@@ -55,6 +55,12 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Todo show:", todoID)
 }
 
+// MakePayment - makes payment from account a to account b
+func MakePayment(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	fmt.Fprintln(w, "Make Payment Vars: ", vars)
+}
+
 // CreateAccount defining the LoadAccount function
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

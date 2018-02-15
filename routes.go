@@ -68,4 +68,10 @@ var routes = Routes{
 		"/getAccount/{name}",
 		GetAccount,
 	},
+	Route{
+		"MakePayment",
+		"GET",
+		"/makepayment/{details}",
+		MakePayment,
+	},
 }
