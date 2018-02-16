@@ -2,34 +2,36 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	b "github.com/stellar/go/build"
 	"github.com/stellar/go/clients/horizon"
 )
 
 // MakeNewPayment function
-func MakeNewPayment(from string, to string, nativeAmount string) {
-	blob := createTransaction(from, to, nativeAmount)
+func MakeNewPayment(fromPubK string, fromPrK string, toPubK string, nativeAmount string, w http.ResponseWriter) {
+	fmt.Fprintln(w, "****  In MakeNewPayment function *****")
+	blob := createTransaction(fromPubK, fromPrK, toPubK, nativeAmount)
+	fmt.Fprintln(w, "Transaction created. blob: ", blob)
 	submitTransaction(blob)
 }
 
 // CreateTransaction this creates a payment transaction and returns the blob for submitting the txn
-func createTransaction(from string, to string, nativeAmount string) string {
+func createTransaction(fromPubK string, fromPrK string, toPK string, nativeAmount string) string {
 
 	tx, err := b.Transaction(
-		b.SourceAccount{AddressOrSeed: from},
+		b.SourceAccount{AddressOrSeed: fromPubK},
 		b.TestNetwork,
 		b.AutoSequence{SequenceProvider: horizon.DefaultTestNetClient},
 		b.Payment(
-			b.Destination{AddressOrSeed: to},
+			b.Destination{AddressOrSeed: toPK},
 			b.NativeAmount{Amount: nativeAmount},
 		),
 	)
 	if err != nil {
 		panic(err)
 	}
-
-	txe, err := tx.Sign(from)
+	txe, err := tx.Sign(fromPrK)
 	if err != nil {
 		panic(err)
 	}

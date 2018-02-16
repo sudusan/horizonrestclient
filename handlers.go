@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,55 +9,26 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// accounts holds all accounts
-type accounts struct {
-	publicKey  map[string]string
-	privateKey map[string]string
-}
-
-var (
-	accts *accounts
-)
-
-// AccountsRepository returns a singleton account repository
-func AccountsRepository() *accounts {
-	if accts == nil {
-		accts = &accounts{
-			publicKey:  make(map[string]string),
-			privateKey: make(map[string]string),
-		}
-	}
-	return accts
-}
-
-// Index defining Index function
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome!")
-}
-
-// TodoIndex defining TodoIndex function
-func TodoIndex(w http.ResponseWriter, r *http.Request) {
-	todos := Todos{
-		Todo{Name: "Write presentation"},
-		Todo{Name: "Host meetup"},
-	}
-
-	if err := json.NewEncoder(w).Encode(todos); err != nil {
-		panic(err)
-	}
-}
-
-// TodoShow defining TodoShow function
-func TodoShow(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	todoID := vars["todoId"]
-	fmt.Fprintln(w, "Todo show:", todoID)
-}
-
 // MakePayment - makes payment from account a to account b
 func MakePayment(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	fmt.Fprintln(w, "Make Payment Vars: ", vars)
+	vals := r.URL.Query()
+	fromPerson := vals["from"]
+	toPerson := vals["to"]
+	amount := vals["amount"]
+
+	fmt.Fprintln(w, "Make Payment Vars: ", vals)
+	fmt.Fprintln(w, "From: ", fromPerson[0])
+	fmt.Fprintln(w, "To: ", toPerson[0])
+	fmt.Fprintln(w, "Amount: ", amount[0])
+	fromPubK, fromPrK := GetAccountKeyPairFor(fromPerson[0])
+	toPubK, _ := GetAccountKeyPairFor(toPerson[0])
+	if fromPubK == "" || toPubK == "" {
+		fmt.Fprintln(w, "From: ", fromPerson[0], " or To: ", toPerson[0], " does not exist")
+	} else {
+		fmt.Fprintln(w, "Ready to make a payment from: ", fromPubK, "  To: ", toPubK, " Using Private Key: ", fromPrK)
+		MakeNewPayment(fromPubK, fromPrK, toPubK, amount[0], w)
+	}
+
 }
 
 // CreateAccount defining the LoadAccount function

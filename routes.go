@@ -39,24 +39,6 @@ func NewRouter() *mux.Router {
 
 var routes = Routes{
 	Route{
-		"Index",
-		"GET",
-		"/",
-		Index,
-	},
-	Route{
-		"TodoIndex",
-		"GET",
-		"/todos",
-		TodoIndex,
-	},
-	Route{
-		"TodoShow",
-		"GET",
-		"/todos/{todoId}",
-		TodoShow,
-	},
-	Route{
 		"CreateAccount",
 		"GET",
 		"/createAccount/{name}",
@@ -71,7 +53,7 @@ var routes = Routes{
 	Route{
 		"MakePayment",
 		"GET",
-		"/makepayment/{details}",
+		"/makepayment/",
 		MakePayment,
 	},
 }
