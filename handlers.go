@@ -65,25 +65,37 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 
 // GetAccountFor - get specific account details
 func GetAccountFor(pk string, w http.ResponseWriter) {
+	localTestNet := GetLocalTestNetClient()
 
-	resp, err := http.Get("https://horizon-testnet.stellar.org/accounts/" + pk)
+	acct, err := localTestNet.LoadAccount(pk)
 	if err != nil {
+		fmt.Fprintln(w, "Account does not exist for: ", pk)
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Fprintln(w, "Found Account: ", acct.AccountID)
+	fmt.Fprintln(w, "Account Balance: ", acct.Balances)
+	/*
+		resp, err := http.Get("https://horizon-testnet.stellar.org/accounts/" + pk)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	fmt.Fprintln(w, "https://horizon-testnet.stellar.org/accounts/"+pk)
-	fmt.Fprintln(w, string(body))
+		fmt.Fprintln(w, "https://horizon-testnet.stellar.org/accounts/"+pk)
+		fmt.Fprintln(w, string(body))
+	*/
 }
 
 // CreateNewAccount - creates a new account for the given addr
 func CreateNewAccount(addr string, w http.ResponseWriter) {
-
-	resp, err := http.Get("https://horizon-testnet.stellar.org/friendbot?addr=" + addr)
+	localTestNet := GetLocalTestNetClient()
+	urlForCreateAccount := localTestNet.URL + "friendbot?addr="
+	resp, err := http.Get(urlForCreateAccount + addr)
+	//resp, err := http.Get("https://horizon-testnet.stellar.org/friendbot?addr=" + addr)
 	if err != nil {
 		log.Fatal(err)
 	}

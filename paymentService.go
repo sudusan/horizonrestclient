@@ -8,6 +8,13 @@ import (
 	"github.com/stellar/go/clients/horizon"
 )
 
+// GetLocalTestNetClient return a local stellar testnet
+func GetLocalTestNetClient() *horizon.Client {
+	newTestClient := horizon.DefaultTestNetClient
+	newTestClient.URL = "https://localhost:8000/"
+	return newTestClient
+}
+
 // MakeNewPayment function
 func MakeNewPayment(fromPubK string, fromPrK string, toPubK string, nativeAmount string, w http.ResponseWriter) {
 	fmt.Fprintln(w, "****  In MakeNewPayment function *****")

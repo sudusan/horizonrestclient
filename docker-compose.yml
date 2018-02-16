@@ -1,0 +1,7 @@
+version: "2"
+
+services:
+  app:
+    image: horizonrestclient
+    ports:
+    - "8080:8080"
