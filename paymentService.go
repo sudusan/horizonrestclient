@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	b "github.com/stellar/go/build"
 	"github.com/stellar/go/clients/horizon"
@@ -10,26 +11,30 @@ import (
 
 // GetLocalTestNetClient return a local stellar testnet
 func GetLocalTestNetClient() *horizon.Client {
+
 	newTestClient := horizon.DefaultTestNetClient
-	newTestClient.URL = "https://localhost:8000/"
+	//newTestClient.HomeDomainForAccount
+	newTestClient.URL = os.Getenv("STELLAR_QUICKSTART_URL")
 	return newTestClient
 }
 
 // MakeNewPayment function
 func MakeNewPayment(fromPubK string, fromPrK string, toPubK string, nativeAmount string, w http.ResponseWriter) {
-	fmt.Fprintln(w, "****  In MakeNewPayment function *****")
+	fmt.Println("****  In MakeNewPayment function *****")
 	blob := createTransaction(fromPubK, fromPrK, toPubK, nativeAmount)
-	fmt.Fprintln(w, "Transaction created. blob: ", blob)
+	fmt.Println("Transaction created. blob: ", blob)
 	submitTransaction(blob)
 }
 
 // CreateTransaction this creates a payment transaction and returns the blob for submitting the txn
 func createTransaction(fromPubK string, fromPrK string, toPK string, nativeAmount string) string {
 
+	fmt.Println("Test Network ID: ", b.TestNetwork.ID())
+	fmt.Println("Test Network passphrase: ", b.TestNetwork.Passphrase)
 	tx, err := b.Transaction(
 		b.SourceAccount{AddressOrSeed: fromPubK},
 		b.TestNetwork,
-		b.AutoSequence{SequenceProvider: horizon.DefaultTestNetClient},
+		b.AutoSequence{SequenceProvider: GetLocalTestNetClient()},
 		b.Payment(
 			b.Destination{AddressOrSeed: toPK},
 			b.NativeAmount{Amount: nativeAmount},
@@ -52,7 +57,8 @@ func createTransaction(fromPubK string, fromPrK string, toPK string, nativeAmoun
 }
 
 func submitTransaction(blob string) {
-	resp, err := horizon.DefaultTestNetClient.SubmitTransaction(blob)
+
+	resp, err := GetLocalTestNetClient().SubmitTransaction(blob)
 	if err != nil {
 		panic(err)
 	}

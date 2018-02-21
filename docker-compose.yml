@@ -1,7 +1,18 @@
 version: "2"
 
 services:
+  stellar:
+    image: stellar/quickstart
+    ports:
+    - "8000:8000"
+    - "11625:11625"
+    - "11626:11626"
+    command: --testnet
   app:
     image: horizonrestclient
     ports:
     - "8080:8080"
+    links:
+      - "stellar"
+    environment:
+    - STELLAR_QUICKSTART_URL=http://stellar:8000
